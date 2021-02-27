@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.conf import settings
 from django.template import Library
 from django.template.defaulttags import URLNode
@@ -28,12 +29,14 @@ def public_schema():
 
 @register.simple_tag()
 def is_tenant_app(app):
-    return app['app_label'] in [tenant_app.split('.')[-1] for tenant_app in settings.TENANT_APPS]
+    cfg = apps.get_app_config(app['app_label'])
+    return cfg.module.__name__ in settings.TENANT_APPS
 
 
 @register.simple_tag()
 def is_shared_app(app):
-    return app['app_label'] in [tenant_app.split('.')[-1] for tenant_app in settings.SHARED_APPS]
+    cfg = apps.get_app_config(app['app_label'])
+    return cfg.module.__name__ in settings.SHARED_APPS
 
 
 @register.simple_tag()
